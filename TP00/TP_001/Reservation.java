@@ -47,9 +47,6 @@ public class Reservation{
     }
 
     public void setCheckin(LocalDateTime checkin) {
-        if(checkin == null){
-            this.checkin = LocalDateTime.now();
-        }
         if(checkin.isBefore(LocalDateTime.now())){
             throw new IllegalArgumentException("Checkin date must be in the future");
         }else{
@@ -62,9 +59,6 @@ public class Reservation{
     }
 
     public void setCheckout(LocalDateTime checkout) {
-        if(checkout == null){
-            throw new IllegalArgumentException("Please confirm your checkout date");
-        }
         if(checkout.isBefore(this.checkin)){
             throw new IllegalArgumentException("Checkout date cannot be before checkin date");
         }else{
