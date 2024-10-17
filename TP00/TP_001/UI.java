@@ -163,8 +163,8 @@ public class UI {
                         );
 
                         JOptionPane.showMessageDialog(frame, message, "Reservation Details", JOptionPane.INFORMATION_MESSAGE);
-                        
-                    } catch (Exception msg) {
+
+                    } catch (IllegalArgumentException msg) {
                         JOptionPane.showMessageDialog(frame, "Error: " + msg.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }else{
@@ -179,18 +179,22 @@ public class UI {
                     }
 
                     if(duplicate == false){
-                        reservations_list.add(reservation);
+                        try{
+                            reservations_list.add(reservation);
+    
+                             String message = String.format(
+                                "Room Number: %s\nCustomer: %s\nCheck-in: %s\nCheck-out: %s\nRemark: %s",
+                                reservation.getRoom_number(),
+                                reservation.getCustomer(),
+                                reservation.getCheckin(),
+                                reservation.getCheckout(),
+                                reservation.getRemark()
+                            );
+                            JOptionPane.showMessageDialog(frame, message, "Reservation Details", JOptionPane.INFORMATION_MESSAGE);
 
-                         String message = String.format(
-                            "Room Number: %s\nCustomer: %s\nCheck-in: %s\nCheck-out: %s\nRemark: %s",
-                            reservation.getRoom_number(),
-                            reservation.getCustomer(),
-                            reservation.getCheckin(),
-                            reservation.getCheckout(),
-                            reservation.getRemark()
-                        );
-
-                        JOptionPane.showMessageDialog(frame, message, "Reservation Details", JOptionPane.INFORMATION_MESSAGE);
+                        }catch (IllegalArgumentException msg){
+                            JOptionPane.showMessageDialog(frame, "Error: " + msg.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
             }
