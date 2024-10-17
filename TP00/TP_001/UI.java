@@ -2,18 +2,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 public class UI {
-    ArrayList<Reservation> reservations_list = new ArrayList<>();
     public void make_window(){
-        System.out.println(reservations_list.size());
+        ReservationHandler handler = new ReservationHandler();
         JFrame frame = new JFrame("Reservation System");
         frame.setSize(400, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,227 +127,38 @@ public class UI {
         editButton.setFocusable(false);
         frame.add(editButton);
 
-//Buttons ActionListeners
+        //Buttons ActionListeners
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String roomNumber = roomInput.getText();
-                String customerName = nameInput.getText();
-                String str_checkinDate = checkinInput.getText();
-                String str_checkoutDate = checkoutInput.getText();
-                String remarkText = remarkInput.getText();
-
-                if (roomNumber.isEmpty() || customerName.isEmpty() || str_checkinDate.isEmpty() || str_checkoutDate.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "All fields except Remark are required.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                    return; 
-                }
-
-                LocalDateTime checkIn = datetime_converter(str_checkinDate);
-                LocalDateTime checkOut = datetime_converter(str_checkoutDate);
-                Reservation reservation = new Reservation(roomNumber, customerName, checkIn, checkOut, remarkText);
-                if(reservations_list.isEmpty()){
-                    try {
-                        reservations_list.add(reservation);
-
-                        String message = String.format(
-                            "Room Number: %s\nCustomer: %s\nCheck-in: %s\nCheck-out: %s\nRemark: %s",
-                            reservation.getRoom_number(),
-                            reservation.getCustomer(),
-                            reservation.getCheckin(),
-                            reservation.getCheckout(),
-                            reservation.getRemark()
-                        );
-
-                        JOptionPane.showMessageDialog(frame, message, "Reservation Details", JOptionPane.INFORMATION_MESSAGE);
-
-                    } catch (IllegalArgumentException msg) {
-                        JOptionPane.showMessageDialog(frame, "Error: " + msg.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }else{
-                    boolean duplicate = false;
-                    for(int i = 0; i < reservations_list.size(); i++){
-                        reservations_list.get(i);
-                        if(reservations_list.get(i).getRoom_number().equals(roomNumber) && reservations_list.get(i).getCheckin().equals(checkIn)){
-                            duplicate = true;
-                            JOptionPane.showMessageDialog(frame, "Room already booked", "Reservation Details", JOptionPane.ERROR_MESSAGE);
-                            break;
-                        }
-                    }
-
-                    if(duplicate == false){
-                        try{
-                            reservations_list.add(reservation);
-    
-                             String message = String.format(
-                                "Room Number: %s\nCustomer: %s\nCheck-in: %s\nCheck-out: %s\nRemark: %s",
-                                reservation.getRoom_number(),
-                                reservation.getCustomer(),
-                                reservation.getCheckin(),
-                                reservation.getCheckout(),
-                                reservation.getRemark()
-                            );
-                            JOptionPane.showMessageDialog(frame, message, "Reservation Details", JOptionPane.INFORMATION_MESSAGE);
-
-                        }catch (IllegalArgumentException msg){
-                            JOptionPane.showMessageDialog(frame, "Error: " + msg.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                }
+                handler.submit_reservation(frame, roomInput, nameInput, checkinInput, checkoutInput, remarkInput);
             }
         });
 
         showlist_button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                // Create a StringBuilder to accumulate all reservation details
-                StringBuilder message = new StringBuilder(); //Basically it let you append multiple string into one giant string
-                if(reservations_list.isEmpty()){
-                    message.append("List is empty");
-                }else{
-                    for(Reservation reservation: reservations_list){
-                        message.append(String.format(" Room Number: %s\nCustomer: %s\nCheck-in: %s\nCheck-out: %s\nRemark: %s\n-------------------------------------\n", 
-                            reservation.getRoom_number(),
-                            reservation.getCustomer(),
-                            reservation.getCheckin(),
-                            reservation.getCheckout(),
-                            reservation.getRemark()
-                        ));
-                    }
-                }
-                JOptionPane.showMessageDialog(frame, message, "Reservation Details", JOptionPane.INFORMATION_MESSAGE);
+                handler.show_all_reservation(frame);
             }
         });
 
         searchButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                String searchName = searchCustomerInput.getText();
-                String searchRoom = searchRoomInput.getText();
-
-                if(!searchName.isEmpty() || !searchRoom.isEmpty()){
-                    boolean found = false;
-                    for(Reservation reservation: reservations_list){
-                        if(reservation.getRoom_number().equals(searchRoom) || reservation.getCustomer().equalsIgnoreCase(searchName)){
-                             String message = String.format("Reservation Found:\nRoom Number: %s\nCustomer: %s\nCheck-in: %s\nCheck-out: %s\nRemark: %s",
-                                reservation.getRoom_number(),
-                                reservation.getCustomer(),
-                                reservation.getCheckin(),
-                                reservation.getCheckout(),
-                                reservation.getRemark()
-                            );
-                            JOptionPane.showMessageDialog(frame, message, "Search Result", JOptionPane.INFORMATION_MESSAGE);
-                            found = true;
-                            break;
-                        }
-                    }if(found == false){
-                        JOptionPane.showMessageDialog(frame, "No Reservation Found", "Search Result", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }else{
-                        JOptionPane.showMessageDialog(frame, "Please enter a room number or customer name to search.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                }
+               handler.search(frame, searchCustomerInput, searchRoomInput);
             }
         });
 
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                String searchName = searchCustomerInput.getText();
-                String searchRoom = searchRoomInput.getText();
-
-                if(!searchName.isEmpty() || !searchRoom.isEmpty()){
-                    boolean found = false;
-                    for(int i = 0; i < reservations_list.size(); i++){
-                        Reservation reservation = reservations_list.get(i);
-                        if(reservation.getRoom_number().equals(searchRoom) || reservation.getCustomer().equalsIgnoreCase(searchName)){
-                            found = true;
-                            reservations_list.remove(i);
-                            JOptionPane.showMessageDialog(frame, "Reservation for room " + reservation.getRoom_number() + " canceled.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                            break;
-                        }
-                    }
-                    
-                    if(found == false){
-                        JOptionPane.showMessageDialog(frame, "No Reservation Found", "Search Result", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }else{
-                    JOptionPane.showMessageDialog(frame, "Please enter a room number or customer name to cancel reservation.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                }
+                handler.cancel_reservation(frame, searchCustomerInput, searchRoomInput);
             }
         });
 
         editButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                String searchName = searchCustomerInput.getText();
-                String searchRoom = searchRoomInput.getText();
-
-                if(!searchName.isEmpty() || !searchRoom.isEmpty()){
-                    boolean found = false;
-                    for(int i = 0; i < reservations_list.size(); i++){
-                        Reservation reservation = reservations_list.get(i);
-                        if(reservation.getCustomer().equals(searchName) || reservation.getRoom_number().equals(searchRoom)){
-                            found = true;
-                            frame.setVisible(false);    
-                            JFrame subframe = new JFrame("Edit Your Reservation");
-                            subframe.setSize(400,400);
-                            subframe.setLayout(null);
-                            subframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-                            // Create and add input fields for Name, Room, Check-in, and Check-out
-                            JLabel nameLabel = new JLabel("Name:");
-                            nameLabel.setBounds(50, 50, 100, 30);
-                            subframe.add(nameLabel);
-                            
-                            JTextField nameInput = new JTextField();
-                            nameInput.setBounds(150, 50, 150, 30);
-                            subframe.add(nameInput);
-                            
-                            JLabel roomLabel = new JLabel("Room:");
-                            roomLabel.setBounds(50, 100, 100, 30);
-                            subframe.add(roomLabel);
-                            
-                            JTextField roomInput = new JTextField();
-                            roomInput.setBounds(150, 100, 150, 30);
-                            subframe.add(roomInput);
-                            
-                            JLabel checkinLabel = new JLabel("Check-in:");
-                            checkinLabel.setBounds(50, 150, 100, 30);
-                            subframe.add(checkinLabel);
-                            
-                            JTextField checkinInput = new JTextField();
-                            checkinInput.setBounds(150, 150, 150, 30);
-                            subframe.add(checkinInput);
-                            
-                            JLabel checkoutLabel = new JLabel("Check-out:");
-                            checkoutLabel.setBounds(50, 200, 100, 30);
-                            subframe.add(checkoutLabel);
-                            
-                            JTextField checkoutInput = new JTextField();
-                            checkoutInput.setBounds(150, 200, 150, 30);
-                            subframe.add(checkoutInput);
-                            
-                            // Add Confirm button
-                            JButton confirmButton = new JButton("Confirm");
-                            confirmButton.setBounds(150, 250, 100, 30);
-                            subframe.add(confirmButton);
-                            subframe.setVisible(true);
-                            break;
-                        }
-                    }
-                    if (found == false){
-                        JOptionPane.showMessageDialog(frame, "No Reservation Found", "Search Result", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }else{
-                    JOptionPane.showMessageDialog(frame, "Please enter a room number or customer name to edit reservation.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                }
+                handler.edit_reservation(frame, searchCustomerInput, searchRoomInput);
             }
         });
 
         frame.setVisible(true);
-    }
-
-    public static LocalDateTime datetime_converter(String dateinput){
-        if(dateinput.matches("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$")){
-            DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-            return LocalDateTime.parse(dateinput, format); //Convert string input to localdatetime object
-        }else{
-            throw new IllegalArgumentException("Invalid date format");
-        }
     }
 }
 

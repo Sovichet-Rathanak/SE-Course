@@ -1,3 +1,4 @@
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Reservation{
@@ -59,8 +60,8 @@ public class Reservation{
     }
 
     public void setCheckout(LocalDateTime checkout) {
-        if(checkout.isBefore(this.checkin)){
-            throw new IllegalArgumentException("Checkout date cannot be before checkin date");
+        if(checkout.isBefore(this.checkin) || checkout.equals(checkin) || Duration.between(this.checkin, checkout).toHours() < 1){
+            throw new IllegalArgumentException("Checkout must be at least an hour after checkin");
         }else{
             this.checkout = checkout;
         }
