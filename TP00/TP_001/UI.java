@@ -162,6 +162,6 @@ public class UI {
     }
 }
 
-//TODO: Edit reservation, when time is not yet started
-//TODO: Swap room when 2 room are booked at identical time
+
+
 
