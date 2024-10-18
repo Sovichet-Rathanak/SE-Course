@@ -61,7 +61,7 @@ public class ReservationHandler {
                 }
             }
         }catch(IllegalArgumentException msg){
-            JOptionPane.showMessageDialog(frame, "Error: " + msg.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Error: " + msg, "Input Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -142,117 +142,130 @@ public class ReservationHandler {
             for (int i = 0; i < reservations_list.size(); i++) {
                 if (reservations_list.get(i).getCustomer().equals(searchName) || reservations_list.get(i).getRoom_number().equals(searchRoom)) {
                     found = true;
-                    if (reservations_list.get(i).getCheckin().isBefore(LocalDateTime.now()) && reservations_list.get(i).getCheckout().isAfter(LocalDateTime.now())) {
-                        JOptionPane.showMessageDialog(frame, "Your reservation is currently ongoing and cannot be edited.", "Editing Failed", JOptionPane.ERROR_MESSAGE);
-                    }else{
-                        frame.setVisible(false);    
-                        JFrame subframe = new JFrame("Edit Your Reservation");
-                        subframe.setSize(400, 400);
-                        subframe.setLayout(null); 
-                        subframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
-                        JLabel nameLabel = new JLabel("Name:");
-                        nameLabel.setBounds(50, 10, 200, 25); 
-                        subframe.add(nameLabel);
-                        
-                        JTextField Edit_nameInput = new JTextField();
-                        Edit_nameInput.setBounds(50, 35, 300, 25); 
-                        subframe.add(Edit_nameInput);
-                        
-                        JLabel roomLabel = new JLabel("Room:");
-                        roomLabel.setBounds(50, 70, 100, 25); 
-                        subframe.add(roomLabel);
-                        
-                        JTextField Edit_roomInput = new JTextField();
-                        Edit_roomInput.setBounds(50, 95, 300, 25); 
-                        subframe.add(Edit_roomInput);
-                        
-                        JLabel checkinLabel = new JLabel("Check-in (yyyy-MM-dd HH:mm):");
-                        checkinLabel.setBounds(50, 130, 300, 25); 
-                        subframe.add(checkinLabel);
-                        
-                        JTextField Edit_checkinInput = new JTextField();
-                        Edit_checkinInput.setBounds(50, 155, 300, 25); 
-                        subframe.add(Edit_checkinInput);
-                        
-                        JLabel checkoutLabel = new JLabel("Check-out (yyyy-MM-dd HH:mm):");
-                        checkoutLabel.setBounds(50, 190, 300, 25); 
-                        subframe.add(checkoutLabel);
-                        
-                        JTextField Edit_checkoutInput = new JTextField();
-                        Edit_checkoutInput.setBounds(50, 215, 300, 25); 
-                        subframe.add(Edit_checkoutInput);
-                        
-                        JButton confirmButton = new JButton("Confirm");
-                        confirmButton.setBounds(50, 250, 100, 25); 
-                        subframe.add(confirmButton);
-                        
-                        subframe.setVisible(true);
-                        
-                        int index = i; 
-                        confirmButton.addActionListener(new ActionListener() {
+                    frame.setVisible(false);    
+                    JFrame subframe = new JFrame("Edit Your Reservation");
+                    subframe.setSize(400, 400);
+                    subframe.setLayout(null); 
+                    subframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+                    JLabel nameLabel = new JLabel("Name:");
+                    nameLabel.setBounds(50, 10, 200, 25); 
+                    subframe.add(nameLabel);
+                    
+                    JTextField Edit_nameInput = new JTextField();
+                    Edit_nameInput.setBounds(50, 35, 300, 25); 
+                    subframe.add(Edit_nameInput);
+                    
+                    JLabel roomLabel = new JLabel("Room:");
+                    roomLabel.setBounds(50, 70, 100, 25); 
+                    subframe.add(roomLabel);
+                    
+                    JTextField Edit_roomInput = new JTextField();
+                    Edit_roomInput.setBounds(50, 95, 300, 25); 
+                    subframe.add(Edit_roomInput);
+                    
+                    JLabel checkinLabel = new JLabel("Check-in (yyyy-MM-dd HH:mm):");
+                    checkinLabel.setBounds(50, 130, 300, 25); 
+                    subframe.add(checkinLabel);
+                    
+                    JTextField Edit_checkinInput = new JTextField();
+                    Edit_checkinInput.setBounds(50, 155, 300, 25); 
+                    subframe.add(Edit_checkinInput);
+                    
+                    JLabel checkoutLabel = new JLabel("Check-out (yyyy-MM-dd HH:mm):");
+                    checkoutLabel.setBounds(50, 190, 300, 25); 
+                    subframe.add(checkoutLabel);
+                    
+                    JTextField Edit_checkoutInput = new JTextField();
+                    Edit_checkoutInput.setBounds(50, 215, 300, 25); 
+                    subframe.add(Edit_checkoutInput);
+                    
+                    JButton confirmButton = new JButton("Confirm");
+                    confirmButton.setBounds(50, 250, 100, 25); 
+                    subframe.add(confirmButton);
+                    
+                    subframe.setVisible(true);
+                    
+                    int index = i; 
+                    confirmButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             try {
                                 String name = Edit_nameInput.getText();
                                 String room = Edit_roomInput.getText();
                                 String str_checkin = Edit_checkinInput.getText();
                                 String str_checkout = Edit_checkoutInput.getText();
-    
+
+                                // Validate inputs
+                                if (name.isEmpty() || room.isEmpty() || str_checkin.isEmpty() || str_checkout.isEmpty()) {
+                                    JOptionPane.showMessageDialog(subframe, "All fields are required!", "Input Error", JOptionPane.ERROR_MESSAGE);
+                                    return;  // Exit if inputs are not valid
+                                }
+
+                                // Convert dates
                                 LocalDateTime checkin = datetime_converter(str_checkin);
                                 LocalDateTime checkout = datetime_converter(str_checkout);
-    
+
                                 Reservation currentReservation = reservations_list.get(index);
                                 Reservation oldRoomReservation = find_old_Reservation(room);
-    
+
+                                // Debugging: print current reservation details
+                                System.out.println("Current Reservation: " + currentReservation.getRoom_number() + " - " + currentReservation.getCheckin() + " to " + currentReservation.getCheckout());
+
+                                // Check if new input is the same as the old one
                                 if (currentReservation.getCheckin().equals(checkin) && 
                                     currentReservation.getCheckout().equals(checkout) && 
                                     currentReservation.getRoom_number().equals(room)) {
                                     JOptionPane.showMessageDialog(subframe, "You've entered the same info", "Error", JOptionPane.ERROR_MESSAGE);
-    
+
+                                // Check if the room is already booked during the desired time
                                 } else if (oldRoomReservation != null && 
                                         oldRoomReservation.getCheckin().equals(checkin) && 
                                         oldRoomReservation.getCheckout().equals(checkout)) {
                                     JOptionPane.showMessageDialog(subframe, "The room is already booked during this time", "Error", JOptionPane.ERROR_MESSAGE);
-    
+
+                                // Swap rooms if needed
                                 } else if (oldRoomReservation != null) {
                                     String tempCustomer = oldRoomReservation.getCustomer();
                                     String tempRoom = oldRoomReservation.getRoom_number();
-    
+
                                     oldRoomReservation.setCustomer(currentReservation.getCustomer());
                                     oldRoomReservation.setRoom_number(currentReservation.getRoom_number());
                                     oldRoomReservation.setCheckin(currentReservation.getCheckin());
                                     oldRoomReservation.setCheckout(currentReservation.getCheckout());
-    
+
                                     currentReservation.setCustomer(tempCustomer);
                                     currentReservation.setRoom_number(tempRoom);
                                     currentReservation.setCheckin(checkin);
                                     currentReservation.setCheckout(checkout);
-    
+
                                     JOptionPane.showMessageDialog(subframe, "Rooms have been swapped successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
-    
+
+                                // Update the reservation directly if no conflicts
                                 } else {
                                     currentReservation.setRoom_number(room);
                                     currentReservation.setCustomer(name);
                                     currentReservation.setCheckin(checkin);
                                     currentReservation.setCheckout(checkout);
-    
+
                                     JOptionPane.showMessageDialog(subframe, "Reservation updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                                 }
-    
+
+                                // Close the subframe after update
                                 subframe.dispose();
                                 frame.setVisible(true);
-    
+
                             } catch (IllegalArgumentException msg) {
+                                // Catch and show errors from datetime conversion or other issues
                                 JOptionPane.showMessageDialog(subframe, msg.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     });
-                    }
+                    break;
                 }
-                if (!found) {
-                    JOptionPane.showMessageDialog(frame, "No Reservation Found", "Search Result", JOptionPane.INFORMATION_MESSAGE);
-                }
-                    }
+            }
+            if (!found) {
+                JOptionPane.showMessageDialog(frame, "No Reservation Found", "Search Result", JOptionPane.INFORMATION_MESSAGE);
+            }
         } else {
             JOptionPane.showMessageDialog(frame, "Please enter a room number or customer name to edit reservation.", "Input Error", JOptionPane.ERROR_MESSAGE);
         }
