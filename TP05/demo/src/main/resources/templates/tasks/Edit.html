@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Edit Existing Product</h1>
+    <form th:action="@{${url}}" method="post" enctype="multipart/form-data">
+      <div class="container">
+        <label>Edit Name</label><br />
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Enter a new name"
+          required
+        /><br /><br />
+
+        <label>Edit Price</label><br />
+        <input
+          type="number"
+          id="price"
+          name="price"
+          placeholder="Enter a new price"
+          required
+        /><br /><br />
+        <button type="submit">Edit Product</button>
+      </div>
+    </form>
+  </body>
+</html>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+  html,
+  body {
+    font-family: "Inter";
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    padding: 1rem;
+    margin: 5px;
+    border: 2px solid black;
+  }
+
+  .container{
+    margin-left: 20px;
+  }
+</style>
+

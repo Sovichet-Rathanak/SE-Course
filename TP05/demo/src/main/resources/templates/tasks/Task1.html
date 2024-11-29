@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product List</title>
+  </head>
+  <body>
+    <h1>Products</h1>
+    <div th:each="product, iter : ${products_list}">
+      <div class="p_list">
+        <span class="title" th:text="${product.product_name}"></span><br />
+        <span th:text="'$' + ${product.price}"></span><br />
+        <span th:text="${product.description}"></span><br />
+        <img
+          class="img"
+          th:src="@{'/image/'+${product.image}}"
+          alt="album image"
+        />
+        <a th:href="@{'/TP05/Edit/'+${iter.index}}">Edit Product</a>
+      </div>
+      <br />
+    </div>
+    <a href="/TP05/Add"><button>Add New Product</button></a>
+  </body>
+</html>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+  html,
+  body {
+    font-family: "Inter";
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    padding: 1rem;
+    margin: 5px;
+    border: 2px solid black;
+  }
+
+  .p_list {
+    list-style-type: none;
+    margin-left: 3rem;
+  }
+
+  .p_list .title {
+    font-weight: bold;
+  }
+
+  .img {
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+  }
+</style>
